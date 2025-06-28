@@ -1,6 +1,6 @@
 # SQLite + Drizzle ORM: Complete Implementation Guide
 
-**v3.0.0 - Final Production Guide**
+**v1.0.0 - Final Production Guide**
 
 *A production-tested, comprehensive guide for implementing SQLite with Drizzle ORM in any project. Based on real-world experience and focused on essential functionality.*
 
