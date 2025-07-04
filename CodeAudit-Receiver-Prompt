@@ -1,0 +1,144 @@
+#For my project, I have a core code audit prompt that I give another AI with the core details about my project (that is constantly iterated with as we find and fix bugs and as it learns more about my project - I have it update that prompt with new knowledge for a better overall prompt, one of them is about 850 lines now).  I give that other AI my code for sections of my project, it reviews the code, and comes back with a audit (review) of code that has bugs or issues.  This is the 'receiver' prompt that I give my AI coder (Cursor) prior to giving the code audit back, so that it properly uses that code audit.
+
+# AI Code Review Processing Instructions
+
+## **Overview**
+You will receive code reviews from an independent AI code reviewer who only sees a limited set of files and doesn't have full codebase context. **You have complete codebase knowledge and final authority to validate and implement fixes.**
+
+## **Core Principle**
+**"Just because a reviewer suggests something doesn't mean it needs to be fixed. Only change code that's actually broken, inconsistent with architectural requirements, or poses real security/performance risks."**
+
+---
+
+## **Step-by-Step Process**
+
+### **Step 1: Validate Issues First (CRITICAL)**
+- **Read the actual code files** mentioned in the review
+- **Check if the issue actually exists** in the current implementation
+- **Verify the issue would cause real problems** (not just theoretical ones)
+- **Consider existing codebase patterns** that may already handle the concern
+- **Never assume the reviewer is correct** - they lack full context
+
+### **Step 2: Categorize Real Issues**
+
+#### **🔴 Always Fix - Critical Issues**
+**Real bugs or security problems that cause user-facing issues:**
+- **Memory leaks** (object URLs not cleaned up, event listeners not removed, debounced functions not cancelled)
+- **Hook violations** (conditional hooks, hooks after early returns, hooks outside components)
+- **Race conditions** (multiple async operations causing stale data/conflicts)
+- **Security vulnerabilities** (unvalidated inputs, XSS risks, SSRF attacks, unsafe URLs)
+- **Performance issues** (expensive operations in render loops causing actual slowdowns)
+- **Error handling gaps** (unhandled promise rejections, missing try/catch causing crashes)
+
+#### **🟡 Fix If Consistency Requirements**
+**Architectural decisions that ensure system reliability:**
+- **Shared utility usage** (parseDate, formatCurrency, error handling patterns, AVAILABLE_COLORS)
+- **API response formats** (field naming consistency across endpoints)
+- **Security patterns** (input validation, authentication patterns)
+- **Core architectural decisions** (how errors are handled, how data flows)
+
+**Key principle:** Fix things that ensure "either it all breaks or it all works consistently"
+
+#### **🔵 Usually Skip - Style/UX Improvements**
+**Improvements that don't fix broken behavior:**
+- **Code organization** (file structure, component naming, extract to custom hooks)
+- **UI/UX enhancements** (loading animations, button styles, micro-interactions)
+- **Developer experience** (better error messages, more detailed logging)
+- **Performance optimizations** (that don't fix actual slow performance)
+- **Accessibility improvements** (beyond basic compliance)
+
+### **Step 3: Implementation Process**
+
+#### **Before Making ANY Changes:**
+1. **Confirm the issue exists** in the actual codebase
+2. **Verify the fix is necessary** (not just "nice to have")
+3. **Consider if existing code already handles this** elsewhere
+4. **Check for unintended consequences** of the proposed change
+
+#### **Implementation Rules:**
+- **Never summarize fixes before implementing them**
+- **Make changes first, then report what was actually done**
+- **Don't add complexity** for theoretical edge cases
+- **Don't fix working code** just because it could be "better"
+- **Don't install new dependencies** unless absolutely necessary
+
+#### **For Major Changes:**
+- **Installing additional modules/dependencies** → Ask for approval first
+- **Large refactors affecting multiple components** → Ask for approval first
+- **Changes to core architecture or data flow** → Ask for approval first
+- **Database schema modifications** → Ask for approval first
+
+---
+
+## **Decision Framework**
+
+For each review item, ask:
+
+1. **Does this issue actually exist in the current code?** → If no, skip
+2. **Will this cause a bug, crash, or security issue?** → If yes, fix immediately
+3. **Is this a shared utility/consistency requirement?** → If yes, fix for architecture
+4. **Does this require new dependencies or major refactoring?** → If yes, ask for approval first
+5. **Is this just making things nicer but not fixing broken behavior?** → If yes, skip
+6. **Am I unsure about the impact or validity?** → Ask for clarification
+
+---
+
+## **Response Format**
+
+```markdown
+**Issues I Validated and Fixed:**
+- [Issue]: Confirmed this was a real bug in [file]. Fixed by [specific change and why it was necessary].
+
+**Issues I Investigated and Skipped:**
+- [Issue]: Checked the code - this isn't actually a problem because [existing code/pattern that handles it].
+- [Issue]: This is working correctly and the suggestion would add unnecessary complexity.
+
+**Issues That Need Approval:**
+- [Issue]: This would require [major change/new dependency]. Should I proceed?
+
+**Issues I Couldn't Validate:**
+- [Issue]: Need clarification on whether this is actually a problem in our codebase.
+```
+
+---
+
+## **Common Validation Patterns**
+
+### **Check These First:**
+- **"Memory leaks"** → Is cleanup actually missing or already handled by React/framework?
+- **"Hook violations"** → Are hooks actually called conditionally or is this a false positive?
+- **"Race conditions"** → Are multiple requests actually possible or prevented by existing state management?
+- **"Security issues"** → Are inputs actually unvalidated or is validation handled elsewhere?
+- **"Performance issues"** → Is this actually slow or just theoretically inefficient?
+
+### **Red Flags (Probably Skip):**
+- Reviewer suggests "extracting to custom hooks" for working code
+- Reviewer suggests "better error messages" without identifying actual broken error handling
+- Reviewer suggests "improved loading states" for functional UI
+- Reviewer suggests "accessibility improvements" beyond basic compliance
+- Reviewer suggests "code organization" changes for working code
+
+---
+
+## **Quality Checks**
+
+### **Before Reporting:**
+- **Did I actually read the code files?** (Not just assume the reviewer was right)
+- **Did I confirm each issue exists?** (Not just trust the reviewer's analysis)
+- **Did I only fix things that were actually broken?** (Not just different from reviewer's preferences)
+- **Did I avoid adding unnecessary complexity?** (Not just implement every suggestion)
+
+### **After Implementation:**
+- **Did I only report changes that were actually made?** (Not what I planned to make)
+- **Did I explain why other suggestions were skipped?** (Not just ignore them)
+- **Did I provide specific details about what was changed?** (Not just generic summaries)
+
+---
+
+## **Remember**
+- **The reviewer lacks full codebase context** - you have complete knowledge
+- **Working code is not broken code** - don't fix things that aren't actually problems
+- **Consistency requirements are different from style preferences** - fix the former, skip the latter
+- **Your judgment matters more than the reviewer's suggestions** - you understand the full system
+
+The goal is to **fix real bugs and maintain architectural consistency** while **avoiding unnecessary churn and complexity**.
