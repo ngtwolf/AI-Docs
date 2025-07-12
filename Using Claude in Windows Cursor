@@ -1,0 +1,90 @@
+# Setting up Claude Code in Cursor Terminal on windows
+
+This guide will help you set up a `claude` command in Cursor's PowerShell terminal that automatically runs Claude Code in your current directory.
+
+## Prerequisites
+
+- WSL Ubuntu installed and working
+- Claude Code installed in your WSL Ubuntu environment
+- Cursor IDE installed
+
+## Step-by-Step Setup
+
+### 1. Open Cursor Terminal
+- Open Cursor
+- Open a new terminal (Terminal → New Terminal or `Ctrl+` `)
+- Make sure you're in a PowerShell terminal (should show `PS` in the prompt)
+
+### 2. Create/Edit PowerShell Profile
+In the terminal, run:
+```powershell
+notepad $PROFILE
+```
+
+If Windows asks if you want to create the file (because it doesn't exist), click **Yes**.
+
+### 3. Add the Claude Function
+Copy and paste this function into the notepad file (changing Username to your ubuntu username):
+
+```powershell
+function claude {
+    $currentPath = Get-Location
+    $drive = $currentPath.Drive.Name.ToLower()
+    $pathWithoutDrive = $currentPath.Path.Substring(2) -replace '\\', '/'
+    $wslPath = "/mnt/$drive$pathWithoutDrive"
+    wsl.exe -d Ubuntu -e bash -c "cd '$wslPath' && /home/[USERNAME]/.npm-global/bin/claude"
+}
+```
+
+**Note:** Replace `/home/[USERNAME]/.npm-global/bin/claude` with your actual Claude installation path. To find it:
+1. Open WSL: `wsl.exe -d Ubuntu`
+2. Run: `which claude`
+3. Use that path in the function above
+
+### 4. Save and Close
+- Save the file (`Ctrl+S`)
+- Close Notepad
+
+### 5. Close and Reopen Terminal
+- Close the current terminal in Cursor
+- Open a new terminal (Terminal → New Terminal or `Ctrl+` `)
+
+### 6. Test the Setup
+- Navigate to any project directory in your terminal:
+  ```powershell
+  cd E:\projects\your-project-name
+  ```
+- Simply type:
+  ```powershell
+  claude
+  ```
+
+Claude Code should now launch in your current directory!
+
+## Troubleshooting
+
+### If you get execution policy errors:
+Run this command in PowerShell:
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+### If the `claude` command isn't found:
+1. Make sure you saved the profile file
+2. Try reloading the profile manually:
+   ```powershell
+   . $PROFILE
+   ```
+3. Verify your Claude installation path is correct
+
+### If you get "cd: No such file or directory":
+Double-check that your Claude installation path in the function matches the output of `which claude` in your WSL environment.
+
+## How It Works
+
+The function:
+1. Gets your current Windows directory
+2. Converts it to WSL format (e.g., `E:\projects` → `/mnt/e/projects`)
+3. Runs Claude Code in that directory through WSL
+
+Now you can simply type `claude` in any project directory and it will launch Claude Code in the correct location!
