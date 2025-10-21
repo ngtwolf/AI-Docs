@@ -1,0 +1,780 @@
+# 🖥️ Retro CRT Theming Guide
+## The Definitive Guide to Building Authentic 1970s-1980s Terminal Interfaces
+
+---
+
+## 📖 Table of Contents
+
+1. [Purpose & Philosophy](#purpose--philosophy)
+2. [Historical Context](#historical-context)
+3. [The Three Authentic Themes](#the-three-authentic-themes)
+4. [Core Design Principles](#core-design-principles)
+5. [Accessibility Considerations](#accessibility-considerations)
+6. [Implementation Guide](#implementation-guide)
+7. [Component Standards](#component-standards)
+8. [Advanced Features](#advanced-features)
+9. [Migration & Best Practices](#migration--best-practices)
+10. [Reference Materials](#reference-materials)
+
+---
+
+## 🎯 Purpose & Philosophy
+
+This theming system recreates the **authentic visual experience** of 1970s-1980s CRT computer terminals. Unlike modern web design with gradients, shadows, and subtle colors, real CRT terminals had **only two visual states**:
+
+### **NORMAL STATE**
+- **Bright phosphor color** on **black background**
+- Used for all text, borders, and interface elements
+
+### **REVERSE/INVERSE STATE**  
+- **Black text** on **bright phosphor background**
+- Used for buttons, hover states, selections, and emphasis
+
+**NO gradients, NO shadows, NO opacity variations, NO subtle shades** - just solid, high-contrast colors like a real terminal!
+
+---
+
+## 🕰️ Historical Context
+
+This system is based on actual vintage computer terminals from the golden age of computing:
+
+### **🟢 Green Phosphor Terminals**
+- **Apple II** (1977) - The personal computer that started it all
+- **IBM 3270** - Mainframe terminals in corporate America
+- **DEC VT100** - The standard terminal for Unix systems
+- **TRS-80** - Radio Shack's entry into personal computing
+
+### **🟠 Amber Phosphor Terminals**
+- **Wyse 60** - Professional terminal workstations
+- **Televideo 950** - Popular business terminal
+- **DEC VT220** - Advanced terminal with amber option
+- **Zenith Z-19** - High-end professional terminal
+
+### **⚪ White Phosphor Terminals**
+- **Commodore PET** (1977) - The first all-in-one computer
+- **Apple Macintosh** (1984) - Revolutionary GUI computer
+- **VT100 White** - Clean, professional terminal variant
+- **IBM PC** - The standard that defined business computing
+
+---
+
+## 🎨 The Three Authentic Themes
+
+### **🟢 Green Theme - "Apple II Classic"**
+```css
+Normal Text:    #22c55e (green-500) on #000000 (black)
+Reverse Text:   #000000 (black) on #22c55e (green-500)
+Borders:        #22c55e (green-500)
+Background:     #000000 (black)
+```
+
+**Historical Reference:** Apple II, IBM 3270, TRS-80, DEC VT100
+
+### **🟠 Amber Theme - "Unix Professional"**
+```css
+Normal Text:    #f59e0b (amber-500) on #000000 (black)
+Reverse Text:   #000000 (black) on #f59e0b (amber-500)
+Borders:        #f59e0b (amber-500)
+Background:     #000000 (black)
+```
+
+**Historical Reference:** Wyse 60, Televideo 950, DEC VT220, Zenith Z-19
+
+### **⚪ White Theme - "Commodore PET Clean"**
+```css
+Normal Text:    #ffffff (white) on #000000 (black)
+Reverse Text:   #000000 (black) on #ffffff (white)
+Borders:        #ffffff (white)
+Background:     #000000 (black)
+```
+
+**Historical Reference:** Commodore PET, Apple Macintosh, VT100 White, IBM PC
+
+---
+
+## ⚡ Core Design Principles
+
+### **1. Two-State System**
+Every element exists in exactly two states:
+- **Normal**: Theme color on black background
+- **Reverse**: Black on theme color background
+
+### **2. High Contrast**
+- Maximum contrast for readability
+- No intermediate shades or gradients
+- Bold, clear visual hierarchy
+
+### **3. Functional Aesthetics**
+- Every color choice serves a purpose
+- Visual feedback through state changes
+- Consistent interaction patterns
+
+### **4. Authentic Typography**
+- Monospace fonts (Courier New, Monaco, etc.)
+- Fixed-width character spacing
+- Terminal-style text rendering
+
+---
+
+## ♿ Accessibility Considerations
+
+The retro aesthetic prioritizes historical authenticity over modern accessibility standards:
+
+### **Contrast Ratios by Theme**
+
+- **🟢 Green Theme (#22c55e)**: Contrast ratio 4.26:1 - borderline accessibility
+  - **Solution**: Use `font-weight: 600` and minimum `16px` text size
+  - **Rationale**: Real Apple II terminals often displayed bold phosphor text
+  - **Best for**: Aesthetic preference when accessibility is not mandated
+  
+- **🟠 Amber Theme (#f59e0b)**: Contrast ratio 7.5:1 - excellent accessibility  
+  - **WCAG AAA compliant** for normal text
+  - **Best for**: Professional environments requiring accessibility
+  
+- **⚪ White Theme (#ffffff)**: Contrast ratio 21:1 - perfect accessibility
+  - **Maximum possible contrast** on black background
+  - **Best for**: High-contrast needs and maximum readability
+
+### **Compliance Recommendations**
+
+**For compliance-critical applications, prefer amber or white themes.**
+
+The green theme provides the most authentic Apple II / VT100 experience but may not meet WCAG 2.1 AA standards (4.5:1 for normal text) without additional font weight. Use amber or white themes when accessibility compliance is required.
+
+---
+
+## 🛠️ Implementation Guide
+
+### **Step 1: Import the Theme Hook**
+
+```typescript
+import { useCRTTheme } from '@/hooks/useCRTTheme';
+import { cn } from '@/lib/utils';
+
+export default function MyComponent() {
+  const { currentTheme } = useCRTTheme();
+  
+  return (
+    <div className={cn("font-mono p-4", currentTheme.bgClass)}>
+      {/* Your themed content */}
+    </div>
+  );
+}
+```
+
+**⚠️ Important:** ALL CRT-themed containers should include `font-mono` for authentic terminal typography. Real CRT terminals used monospace fonts exclusively.
+
+### **Step 2: Use Theme Properties**
+
+```typescript
+// ✅ CORRECT - Dynamic theme colors
+className={cn(
+  currentTheme.textClass,        // Theme color text
+  currentTheme.bgClass,         // Black background
+  currentTheme.borderClass      // Theme color border
+)}
+
+// ❌ WRONG - Hardcoded colors
+className="text-green-400 bg-black border-green-500"
+```
+
+### **Step 3: Apply Reverse States**
+
+```typescript
+// Normal state
+<div className={cn("p-4", currentTheme.textClass)}>
+  Normal text
+</div>
+
+// Reverse state (for buttons, hover, selection)
+<div className={cn(
+  "p-4",
+  currentTheme.selectedBgClass,    // Theme color background
+  currentTheme.selectedTextClass  // Black text
+)}>
+  Selected/Button text
+</div>
+```
+
+---
+
+## 🧩 Component Standards
+
+### **📝 Text Elements**
+
+#### **Normal Text**
+```typescript
+<p className={cn("text-sm", currentTheme.textClass)}>
+  Regular paragraph text
+</p>
+```
+
+#### **Labels & Headings**
+```typescript
+<h1 className={cn("text-2xl font-bold", currentTheme.textLabelClass)}>
+  Page Title
+</h1>
+
+<label className={cn("text-sm font-medium", currentTheme.textLabelClass)}>
+  Form Label
+</label>
+```
+
+#### **Placeholder Text**
+```typescript
+<input 
+  className={cn(
+    "w-full px-3 py-2 bg-black border rounded",
+    currentTheme.textClass,
+    currentTheme.borderClass,
+    currentTheme.placeholderClass
+  )}
+  placeholder="Enter text here..."
+/>
+```
+
+### **🔘 Buttons**
+
+#### **Primary Buttons (Reverse Theme)**
+```typescript
+<ModernButton variant="primary">
+  Primary Action
+</ModernButton>
+```
+**Visual Result:** Black text on theme color background
+
+#### **Secondary Buttons (Normal Theme + Reverse Hover)**
+```typescript
+<ModernButton variant="secondary">
+  Secondary Action
+</ModernButton>
+```
+**Visual Result:** Theme color text on black background, inverts on hover
+
+#### **Custom Button Pattern**
+```typescript
+<button className={cn(
+  "px-4 py-2 border rounded transition-colors",
+  "bg-black hover:bg-green-400 hover:text-black",
+  currentTheme.textClass,
+  currentTheme.borderClass
+)}>
+  Custom Button
+</button>
+```
+
+### **📋 Forms & Inputs**
+
+#### **Text Inputs**
+```typescript
+<input 
+  type="text"
+  className={cn(
+    "w-full px-3 py-2 bg-black border rounded focus:outline-none",
+    currentTheme.input.bgClass,
+    currentTheme.input.textClass,
+    currentTheme.input.borderClass,
+    currentTheme.input.placeholderClass
+  )}
+/>
+```
+
+#### **Textareas**
+```typescript
+<textarea 
+  className={cn(
+    "w-full px-3 py-2 bg-black border rounded resize-none",
+    currentTheme.textarea.focusRingClass,
+    currentTheme.input.textClass,
+    currentTheme.input.borderClass
+  )}
+/>
+```
+
+#### **Checkboxes**
+```typescript
+<input
+  type="checkbox"
+  className={cn(
+    "w-4 h-4 bg-black border rounded focus:ring-2",
+    currentTheme.borderClass,
+    currentTheme.textClass
+  )}
+  style={{
+    accentColor: currentTheme.accentColorValue
+  } as React.CSSProperties}
+/>
+```
+
+#### **Switches**
+```typescript
+<Switch 
+  className={cn(
+    "data-[state=checked]:bg-green-500 data-[state=unchecked]:bg-black",
+    currentTheme.borderClass
+  )}
+  style={{
+    backgroundColor: isChecked ? currentTheme.accentColorValue : undefined
+  } as React.CSSProperties}
+/>
+```
+
+### **📊 Tables & Lists**
+
+#### **Modern Table Component**
+```typescript
+<ModernTable
+  data={items}
+  columns={[
+    {
+      key: 'name',
+      title: 'Name',
+      render: (value: string) => (
+        <span className={cn("font-mono text-sm", currentTheme.textClass)}>
+          {value}
+        </span>
+      )
+    }
+  ]}
+  searchable={true}
+  className="scrollbar-theme"
+/>
+```
+
+#### **Custom Table**
+```typescript
+<table className={cn("w-full", currentTheme.borderClass)}>
+  <thead>
+    <tr className={cn("border-b", currentTheme.borderClass)}>
+      <th className={cn("text-left p-2", currentTheme.textLabelClass)}>
+        Header
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr className={cn("hover:opacity-80", currentTheme.textClass)}>
+      <td className="p-2">Cell content</td>
+    </tr>
+  </tbody>
+</table>
+```
+
+### **📦 Cards & Containers**
+
+#### **Basic Card**
+```typescript
+<div className={cn(
+  "bg-black border rounded-lg p-4",
+  currentTheme.borderClass
+)}>
+  <h3 className={cn("text-lg font-semibold mb-2", currentTheme.textClass)}>
+    Card Title
+  </h3>
+  <p className={cn("text-sm", currentTheme.textClass)}>
+    Card content
+  </p>
+</div>
+```
+
+#### **Status Badges**
+```typescript
+<span className={cn(
+  "px-2 py-1 rounded text-xs font-mono border",
+  currentTheme.selectedBgClass,
+  currentTheme.selectedTextClass,
+  currentTheme.borderClass
+)}>
+  Status
+</span>
+```
+
+### **📋 Dropdowns & Selects**
+
+#### **Shadcn Select Component**
+
+**✅ Perfect Implementation - Save Dialog Dropdown** (Primary Reference)
+**Location:** `/src/app/generate/page.tsx` - Lines 1365-1378
+
+```typescript
+<Select 
+  onValueChange={(value) => {
+    if (value === "new_save") { setSaveMode('new'); setSelectedSaveId(null); }
+    else { setSaveMode('overwrite'); setSelectedSaveId(value); const s = userSaves.find(sv => sv.id.toString() === value); if (s) setSaveName(s.save_name); }
+  }}
+  defaultValue={selectedSaveId || "new_save"}
+>
+  <SelectTrigger className={cn("w-full", currentTheme.select.triggerBgClass, currentTheme.select.triggerTextClass, currentTheme.select.triggerBorderClass, currentTheme.ringClass)}>
+    <SelectValue placeholder="Choose existing..." />
+  </SelectTrigger>
+  <SelectContent className={cn(currentTheme.select.contentBgClass)}>
+    <SelectItem value="new_save" className={cn(currentTheme.select.itemTextClass, currentTheme.select.itemHoverBgClass, currentTheme.select.itemHoverTextClass)}>Save as New...</SelectItem>
+    {loadingSaves ? <div className={cn("p-2 text-center", currentTheme.textLabelClass)}>Loading...</div> : (
+      userSaves.map(save => (
+        <SelectItem key={save.id} value={save.id.toString()} className={cn(currentTheme.select.itemTextClass, currentTheme.select.itemHoverBgClass, currentTheme.select.itemHoverTextClass)}>
+          {save.save_name} ({new Date(save.created).toLocaleDateString()})
+        </SelectItem>
+      ))
+    )}
+  </SelectContent>
+</Select>
+```
+
+**Visual Result:**
+- **SelectTrigger**: Black background, theme color text, theme color border, theme-colored focus ring
+- **SelectContent**: Black background with theme color border
+- **SelectItem**: Normal state (theme color text on black), hover/selected state (black text on theme color background)
+
+#### **Native HTML Select**
+```typescript
+<select className={cn(
+  "w-full px-3 py-2 bg-black border rounded",
+  "select-theme scrollbar-theme",
+  currentTheme.textClass,
+  currentTheme.borderClass
+)}>
+  <option>Option 1</option>
+  <option>Option 2</option>
+</select>
+```
+
+### **🎨 Icons**
+
+#### **Regular Icons**
+```typescript
+<AlertTriangle className={cn("w-5 h-5", currentTheme.textClass)} />
+<XCircle className={cn("w-5 h-5", currentTheme.textClass)} />
+```
+
+#### **Icons in Buttons**
+```typescript
+<ModernButton icon={<Database className="w-4 h-4" />}>
+  Create Backup
+</ModernButton>
+```
+
+#### **Icons in Cards**
+```typescript
+<div className={cn(
+  "w-8 h-8 rounded-lg flex items-center justify-center",
+  currentTheme.primaryButton.bgClass
+)}>
+  <Database className={cn("w-4 h-4", currentTheme.primaryButton.textClass)} />
+</div>
+```
+
+---
+
+## 🎛️ Advanced Features
+
+### **CSS Variables System**
+
+The theme system automatically sets CSS variables for Shadcn UI components:
+
+```css
+.theme-green {
+  --foreground: 142 71% 45%;    /* Green text */
+  --background: 0 0% 0%;        /* Black background */
+  --border: 142 71% 45%;        /* Green borders */
+  --primary: 142 71% 45%;       /* Green background for buttons */
+  --primary-foreground: 0 0% 0%; /* Black text on buttons */
+  --accent: 142 71% 45%;        /* Green for hover states */
+  --accent-foreground: 0 0% 0%; /* Black text on hover */
+}
+
+.theme-amber {
+  --foreground: 39 100% 50%;    /* Amber text */
+  --background: 0 0% 0%;        /* Black background */
+  --border: 39 100% 50%;        /* Amber borders */
+  --primary: 39 100% 50%;       /* Amber background for buttons */
+  --primary-foreground: 0 0% 0%; /* Black text on buttons */
+  --accent: 39 100% 50%;        /* Amber for hover states */
+  --accent-foreground: 0 0% 0%; /* Black text on hover */
+}
+
+.theme-white {
+  --foreground: 0 0% 100%;      /* White text */
+  --background: 0 0% 0%;        /* Black background */
+  --border: 0 0% 100%;          /* White borders */
+  --primary: 0 0% 100%;         /* White background for buttons */
+  --primary-foreground: 0 0% 0%; /* Black text on buttons */
+  --accent: 0 0% 100%;          /* White for hover states */
+  --accent-foreground: 0 0% 0%; /* Black text on hover */
+}
+```
+
+This ensures ALL Shadcn components (Input, Select, Dialog, etc.) automatically respect the theme!
+
+### **Custom CSS Classes**
+
+#### **Scrollbars**
+```css
+.scrollbar-theme {
+  scrollbar-width: thin;
+  scrollbar-color: var(--theme-color) rgb(0 0 0);
+}
+
+.scrollbar-theme::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-theme::-webkit-scrollbar-track {
+  background: rgb(0 0 0);
+}
+
+.scrollbar-theme::-webkit-scrollbar-thumb {
+  background: var(--theme-color);
+  border-radius: 4px;
+}
+
+.scrollbar-theme::-webkit-scrollbar-thumb:hover {
+  background: var(--theme-color-hover);
+}
+```
+
+#### **Select Options**
+```css
+.select-theme {
+  background-color: rgb(0 0 0) !important;
+  color: var(--theme-color) !important;
+}
+
+.select-theme option {
+  background-color: rgb(0 0 0) !important;
+  color: var(--theme-color) !important;
+}
+
+.select-theme option:hover,
+.select-theme option:checked {
+  background-color: rgb(0 0 0) !important;
+  color: var(--theme-color) !important;
+}
+```
+
+#### **Sliders**
+```css
+.slider-theme {
+  background: rgb(0 0 0);
+  border: 1px solid var(--theme-color);
+}
+
+.slider-theme::-webkit-slider-thumb {
+  background: var(--theme-color);
+  border: 2px solid rgb(0 0 0);
+}
+```
+
+---
+
+## 📚 Migration & Best Practices
+
+### **Migration Checklist**
+
+When updating a component to use the theme system:
+
+- [ ] Import `useCRTTheme` hook
+- [ ] Import `cn` utility
+- [ ] Add `const { currentTheme } = useCRTTheme();`
+- [ ] Add `font-mono` to main container for authentic typography
+- [ ] Replace ALL hardcoded colors:
+  - `text-green-400` → `currentTheme.textClass`
+  - `text-green-300` → `currentTheme.textLabelClass`
+  - `border-green-500` → `currentTheme.borderClass`
+  - `bg-green-500` (hover) → `currentTheme.hoverBgClass`
+  - `hover:text-green-300` → `currentTheme.hoverTextClass`
+  - `gray-300` (white theme) → Use `#ffffff` instead
+- [ ] Remove any shadows or gradients (not authentic to CRT terminals)
+- [ ] Test with ALL three themes (green, amber, white)
+- [ ] Verify hover states are readable (should invert!)
+- [ ] Add `scrollbar-theme` to scrollable areas
+- [ ] Add `select-theme` to native select elements
+
+### **Best Practices**
+
+1. **Always use theme properties** - Never hardcode colors
+2. **Use monospace fonts globally** - Add `font-mono` to all CRT-themed containers
+3. **Never use shadows or gradients** - These don't exist on real CRT terminals
+4. **White theme uses pure white** - Not gray variants (`#ffffff`, never `#d1d5db`)
+5. **Test all themes** - Ensure components work with green, amber, and white
+6. **Use cn() utility** - Combine classes properly
+7. **Follow reverse theme pattern** - Buttons and interactive elements use reverse colors
+8. **Maintain consistency** - Use the same patterns across all components
+9. **Use ModernButton component** - For consistent button styling
+10. **Use ModernTable component** - For consistent table styling
+11. **Apply scrollbar-theme** - To all scrollable containers
+12. **Apply select-theme** - To all native select elements
+
+### **Common Patterns**
+
+#### **Card Components**
+```typescript
+<div className={cn("bg-black border rounded-lg p-4", currentTheme.borderClass)}>
+  <h3 className={cn("text-lg font-semibold", currentTheme.textClass)}>Title</h3>
+  <p className={cn("text-sm", currentTheme.textClass)}>Content</p>
+</div>
+```
+
+#### **Form Inputs**
+```typescript
+<input 
+  className={cn(
+    "w-full px-3 py-2 bg-black border rounded-md focus:outline-none",
+    currentTheme.input.bgClass,
+    currentTheme.input.textClass,
+    currentTheme.input.borderClass,
+    currentTheme.input.placeholderClass
+  )}
+/>
+```
+
+#### **Action Buttons**
+```typescript
+<button className={cn(
+  "px-4 py-2 border rounded-md transition-colors",
+  "bg-black hover:bg-green-400 hover:text-black",
+  currentTheme.textClass,
+  currentTheme.borderClass
+)}>
+  Action
+</button>
+```
+
+#### **Status Badges**
+```typescript
+<span className={cn(
+  "px-2 py-1 rounded text-xs font-mono border",
+  currentTheme.selectedBgClass,
+  currentTheme.selectedTextClass,
+  currentTheme.borderClass
+)}>
+  Status
+</span>
+```
+
+---
+
+## 📖 Reference Materials
+
+### **Theme Properties Reference**
+
+#### **Basic Properties**
+- `currentTheme.textClass` - Normal text color
+- `currentTheme.textLabelClass` - Label text color  
+- `currentTheme.borderClass` - Border color
+- `currentTheme.bgClass` - Background color
+- `currentTheme.placeholderClass` - Placeholder text color
+
+#### **Color Values (for CSS-in-JS)**
+- `currentTheme.accentColorValue` - Primary theme color (hex)
+- `currentTheme.borderColorValue` - Border color (hex)
+- `currentTheme.bgColorValue` - Background color (hex)
+
+#### **Button Properties**
+- `currentTheme.primaryButton.bgClass` - Primary button background
+- `currentTheme.primaryButton.textClass` - Primary button text
+- `currentTheme.secondaryButton.bgClass` - Secondary button background
+- `currentTheme.secondaryButton.textClass` - Secondary button text
+
+#### **Hover/Selected States**
+- `currentTheme.hoverBgClass` - Hover background (reverse theme)
+- `currentTheme.hoverTextClass` - Hover text (reverse theme)
+- `currentTheme.selectedBgClass` - Selected background (reverse theme)
+- `currentTheme.selectedTextClass` - Selected text (reverse theme)
+
+#### **Input Properties**
+- `currentTheme.input.bgClass` - Input background
+- `currentTheme.input.textClass` - Input text
+- `currentTheme.input.borderClass` - Input border
+- `currentTheme.input.placeholderClass` - Input placeholder
+
+#### **Select Properties**
+- `currentTheme.select.triggerBgClass` - Select trigger background
+- `currentTheme.select.triggerTextClass` - Select trigger text
+- `currentTheme.select.itemHoverBgClass` - Select option hover background
+- `currentTheme.select.itemHoverTextClass` - Select option hover text
+
+### **Perfect Reference Implementation**
+
+The **maintenance page** (`/src/app/admin/system/maintenance/page.tsx`) is the PERFECT example of retro CRT styling and should be used as the standard for all admin pages.
+
+### **Perfect Examples in Codebase**
+
+1. **Save Dialog Dropdown** - `/src/app/generate/page.tsx:1365-1378` ⭐ PRIMARY REFERENCE
+2. **Code History Dropdown** - `/src/app/generate/page.tsx:1173-1204`
+3. **AI Config Dropdowns** - `/src/app/admin/system/ai/page.tsx` (with inline styles for extra enforcement)
+4. **Maintenance Page** - `/src/app/admin/system/maintenance/page.tsx` ⭐ PERFECT COMPONENT REFERENCE
+
+**Reference Files:**
+- **Primary Reference:** `/src/app/admin/system/maintenance/page.tsx`
+- **Supporting Components:**
+  - `/src/app/admin/components/ui/ModernButton.tsx`
+  - `/src/app/admin/components/ui/ModernTable.tsx`
+  - `/src/app/globals.css` (checkbox, scrollbar, select CSS)
+
+### **Testing Theme Changes**
+
+#### **Manual Testing**
+1. Use the theme toggle in the navigation
+2. Verify all colors change appropriately
+3. Check hover states work correctly
+4. Ensure text remains readable
+
+#### **Automated Testing**
+```typescript
+// Test theme switching
+const { currentTheme } = useCRTTheme();
+expect(currentTheme.textClass).toBe('text-green-400'); // or amber/white
+```
+
+### **Troubleshooting**
+
+#### **Common Issues**
+
+1. **Colors not changing with theme**
+   - Check if you're using hardcoded colors
+   - Verify you're using `currentTheme` properties
+
+2. **Hover states not working**
+   - Ensure you're using `currentTheme.hoverBgClass` and `currentTheme.hoverTextClass`
+   - Check if CSS classes are properly applied
+
+3. **Dropdown options not themed**
+   - Add `select-theme` class to `<select>` elements
+   - Verify CSS is loaded
+
+4. **Text not readable**
+   - Ensure proper contrast between text and background
+   - Use `currentTheme.textClass` for text colors
+
+#### **Debugging**
+```typescript
+// Log current theme to debug
+console.log('Current theme:', currentTheme);
+
+// Check if theme is applied
+console.log('Text class:', currentTheme.textClass);
+console.log('Border class:', currentTheme.borderClass);
+```
+
+---
+
+## 🎯 Conclusion
+
+This Retro CRT Theming Guide provides everything needed to build authentic 1970s-1980s terminal interfaces. By following these principles and using the provided theme properties, developers can create websites that capture the nostalgic charm of early computing while maintaining modern functionality.
+
+### **Key Takeaways:**
+
+1. **Authenticity First** - Real terminals had only two visual states
+2. **High Contrast** - Maximum readability through bold color choices
+3. **Consistent Patterns** - Use the same interaction patterns throughout
+4. **Dynamic Theming** - Never hardcode colors, always use theme properties
+5. **Historical Accuracy** - Based on actual vintage computer terminals
+
+### **Remember:**
+**Never hardcode colors. Always use theme properties. Test with all three themes.**
+
+This system ensures that every component automatically adapts to the user's chosen theme while maintaining the authentic retro computing aesthetic that makes these interfaces so memorable and beloved.
+
+---
+
+*Built with ❤️ for the retro computing community*
